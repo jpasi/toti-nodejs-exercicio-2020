@@ -13,6 +13,8 @@ module.exports = {
      *
     */
 
+
+
     await queryInterface.bulkInsert('Tasks', [{
       description: 'Batata',
       done: false,
@@ -39,4 +41,6 @@ module.exports = {
      * await queryInterface.bulkDelete('People', null, {});
      */
   }
+
+  
 }
