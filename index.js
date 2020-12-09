@@ -1,6 +1,5 @@
 const express = require('express')
-const { createQuery } = require('mysql2/typings/mysql/lib/Connection')
-const { Sequelize, DataTypes, where } = require('sequelize')
+const { Sequelize, DataTypes} = require('sequelize')
 const task = require('./models/task')
 const Task = require('./models/task')
 
@@ -15,62 +14,47 @@ app.use(express.json())
 
 // List tasks
 app.get('/tasks', async (req, res) => {
-  res.json(await tasks.findAll())
+  const tas =  await tasks.findAll()
+  
+  res.json({ Tasks: tas })
 })
 
 // Create task
 
-// app.post('/tasks', async (req, res) => {
-//   const body = await tasks.create({
-//     description: "NewTask",
-//     done: "false"
-//   }, { tasks: ['description', 'done'] });
-//   console.log(tasks.description)
-//   console.log(tasks.done)
-
-  
-//   res.json(body)
-  
-// })
-
-
 app.post('/tasks', async (req, res) => {
-  const body = req.body.tasks
-await queryInterface.bulkInsert('Tasks', [{
-    description: body.tasks.description,
-    done: body.tasks.done,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }
-  
+  const body = await tasks.create({
+    description: req.body.description,
+    done: req.body.done
+   })
+
+  res.json(body)
+ 
 })
-
-
-
 
 // Show task
 app.get('/tasks/:id', async (req, res) => {
   const taskId = req.params.id
   const Find = await tasks.findByPk(taskId)
-  res.send({ Find })
+  res.json({ Find })
  
 })
 
 // Update task
-app.put('/tasks/:id',async (req, res) => {
+app.put('/tasks/:id', async (req, res) => {
   const taskId = req.params.id
-  const Find = await tasks.findByPk(taskId)
-  const des = req.params.description
-  const don = req.params.done
-  res.send(Find)
+  const body = await tasks.update({ description: req.body.description,  done: req.body.done },
+    { where: {id: taskId}})
+
+  res.json({ action: 'Atualizando task', taskId: taskId })
+
 })
 
-// // Delete task
-// app.delete('/tasks/:id', (req, res) => {
-//   const taskId = req.params.id
-
-//   res.send({ action: 'Deleting task', taskId: taskId })
-// })
+// Delete task
+app.delete('/tasks/:id', async (req, res) => {
+  const taskId = req.params.id
+  const del = await tasks.destroy({ where: { id: taskId }})
+  res.send({ action: 'Deleting task', taskId: taskId })
+})
 
 app.listen(3000, () => {
   console.log('Iniciando o ExpressJS na porta 3000')
